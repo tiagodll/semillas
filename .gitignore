@@ -4,6 +4,9 @@
 *.so
 *.dylib
 
+#sensible files
+config.yml
+
 # Test binary, build with `go test -c`
 *.test
 
