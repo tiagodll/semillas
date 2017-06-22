@@ -17,8 +17,18 @@ func main() {
 	for _, file := range files {
 
 		migrations := ReadYaml(dirname + "/" + file.Name())
-		sqler := &MssqlSqler{}
-		Migrate(migrations, sqler)
+
+		var sqler Sqler
+		config := &Config{}
+		config.Load()
+		switch config.Db.Type {
+		case "mssql":
+			sqler = &MssqlSqler{}
+		case "sqlite3":
+			sqler = &Sqliter{}
+		}
+
+		sqler.Migrate(migrations)
 	}
 }
 

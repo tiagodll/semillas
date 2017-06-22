@@ -1,10 +1,36 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
+	"log"
+	"os"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type Sqliter struct{}
+
+func (this *Sqliter) Migrate(migrations []Migration) {
+	config := &Config{}
+	config.Load()
+
+	os.Remove(config.Db.ConnectionString)
+	db, err := sql.Open(config.Db.Type, config.Db.ConnectionString)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	for _, m := range migrations {
+		fmt.Printf("%s", this.ToSql(&m))
+		result, err := db.Exec(this.ToSql(&m))
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("%v", result)
+	}
+}
 
 func (this *Sqliter) ToSql(m *Migration) string {
 	switch {
@@ -34,13 +60,13 @@ func (this *Sqliter) createTableToSql(t *CreateTable) string {
 func (this *Sqliter) GetNameAndType(c *Column) (string, string) {
 	switch {
 	case c.StringColumn != "":
-		return c.StringColumn, "[varchar](max)"
+		return c.StringColumn, "text"
 	case c.BoolColumn != "":
-		return c.BoolColumn, "[bit]"
+		return c.BoolColumn, "int"
 	case c.IntColumn != "":
-		return c.IntColumn, "[int]"
+		return c.IntColumn, "int"
 	case c.FloatColumn != "":
-		return c.FloatColumn, "[float]"
+		return c.FloatColumn, "float"
 	}
 	return "", ""
 }

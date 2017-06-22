@@ -1,10 +1,33 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
+	"log"
+
+	_ "github.com/denisenkom/go-mssqldb"
 )
 
 type MssqlSqler struct{}
+
+func (this *MssqlSqler) Migrate(migrations []Migration) {
+	config := &Config{}
+	config.Load()
+	db, err := sql.Open(config.Db.Type, config.Db.ConnectionString)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	for _, m := range migrations {
+		fmt.Printf("%s", this.ToSql(&m))
+		result, err := db.Exec(this.ToSql(&m))
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("%v", result)
+	}
+}
 
 func (this *MssqlSqler) ToSql(m *Migration) string {
 	switch {

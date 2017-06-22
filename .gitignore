@@ -3,6 +3,7 @@
 *.dll
 *.so
 *.dylib
+*.db
 
 #sensible files
 config.yml

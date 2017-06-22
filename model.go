@@ -1,6 +1,7 @@
 package main
 
 type Sqler interface {
+	Migrate(migrations []Migration)
 	ToSql(m *Migration) string
 }
 
