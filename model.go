@@ -10,6 +10,7 @@ type Migration struct {
 	IsDropTable    DropTable    `yaml:"drop_table"`
 	IsAddColumn    AddColumn    `yaml:"add_column"`
 	IsRemoveColumn RemoveColumn `yaml:"remove_column"`
+	IsInsert       Insert       `yaml:"insert"`
 	SQL            string       `yaml:"sql"`
 }
 
@@ -41,4 +42,11 @@ type AddColumn struct {
 type RemoveColumn struct {
 	Sqler
 	Name string `yaml:"name"`
+}
+
+type Insert struct {
+	Sqler
+	Table   string     `yaml:"table"`
+	Columns []string   `yaml:"columns"`
+	Values  [][]string `yaml:"values"`
 }

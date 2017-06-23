@@ -6,6 +6,7 @@
     columns:
     - string: name
     - string: email
+    - int: x
 
 - create_table: 
     name: asd
@@ -23,4 +24,11 @@
 - drop_table:
     name: asd
 
-- sql: INSERT INTO authors VALUES('asd', 'qwe');
+- insert:
+    table: authors
+    columns: [name, email, x]
+    values:
+     - ['asd', 'qwe', 2]
+     - ['zxc', '123', null]
+
+- sql: INSERT INTO authors VALUES('asd', 'qwe', 2);

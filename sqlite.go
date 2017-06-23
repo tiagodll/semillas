@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"reflect"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -42,6 +43,8 @@ func (this *Sqliter) ToSql(m *Migration) string {
 		return this.addColumnToSql(&m.IsAddColumn)
 	case m.IsRemoveColumn != RemoveColumn{}:
 		return this.removeColumnToSql(&m.IsRemoveColumn)
+	case m.IsInsert.Table != Insert{}.Table:
+		return this.insertToSql(&m.IsInsert)
 	}
 	return m.SQL
 }
@@ -82,4 +85,27 @@ func (this *Sqliter) addColumnToSql(c *AddColumn) string {
 
 func (this *Sqliter) removeColumnToSql(c *RemoveColumn) string {
 	return ""
+}
+
+func (this *Sqliter) insertToSql(c *Insert) string {
+	resp := ""
+	column_names := ""
+	for _, col := range c.Columns {
+		column_names = fmt.Sprintf("%s, %s", column_names, col)
+	}
+	for _, row := range c.Values {
+		values := ""
+		for _, cell := range row {
+			switch reflect.ValueOf(cell).Kind() {
+			case reflect.String:
+				values = fmt.Sprintf("%s, '%s'", values, cell)
+			case reflect.Invalid:
+				values = fmt.Sprintf("%s, NULL", values)
+			default:
+				values = fmt.Sprintf("%s, %v", values, cell)
+			}
+		}
+		resp += fmt.Sprintf("INSERT INTO %s(%s) VALUES(%s);\n", c.Table, column_names[2:len(column_names)], values[2:len(values)])
+	}
+	return resp
 }
