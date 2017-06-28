@@ -12,20 +12,46 @@ import (
 
 type Sqliter struct{}
 
-func (this *Sqliter) Migrate(migrations []Migration) {
+func (this *Sqliter) Version() int {
 	config := &Config{}
 	config.Load()
 
-	os.Remove(config.Db.ConnectionString)
 	db, err := sql.Open(config.Db.Type, config.Db.ConnectionString)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	for _, m := range migrations {
-		fmt.Printf("%s", this.ToSql(&m))
-		result, err := db.Exec(this.ToSql(&m))
+	row, err := db.Query("Select version from semillas")
+	if err != nil {
+		return -1
+	}
+	version := 0
+	row.Scan(&version)
+
+	return version
+}
+
+func (this *Sqliter) Init() {
+	config := &Config{}
+	config.Load()
+
+	os.Remove(config.Db.ConnectionString)
+}
+
+func (this *Sqliter) Update(semillas []Semilla) {
+	config := &Config{}
+	config.Load()
+
+	db, err := sql.Open(config.Db.Type, config.Db.ConnectionString)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	for _, s := range semillas {
+		fmt.Printf("%s", this.ToSql(&s))
+		result, err := db.Exec(this.ToSql(&s))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -33,20 +59,20 @@ func (this *Sqliter) Migrate(migrations []Migration) {
 	}
 }
 
-func (this *Sqliter) ToSql(m *Migration) string {
+func (this *Sqliter) ToSql(s *Semilla) string {
 	switch {
-	case m.IsCreateTable.Name != CreateTable{}.Name:
-		return this.createTableToSql(&m.IsCreateTable)
-	case m.IsDropTable != DropTable{}:
-		return this.dropTableToSql(&m.IsDropTable)
-	case m.IsAddColumn != AddColumn{}:
-		return this.addColumnToSql(&m.IsAddColumn)
-	case m.IsRemoveColumn != RemoveColumn{}:
-		return this.removeColumnToSql(&m.IsRemoveColumn)
-	case m.IsInsert.Table != Insert{}.Table:
-		return this.insertToSql(&m.IsInsert)
+	case s.IsCreateTable.Name != CreateTable{}.Name:
+		return this.createTableToSql(&s.IsCreateTable)
+	case s.IsDropTable != DropTable{}:
+		return this.dropTableToSql(&s.IsDropTable)
+	case s.IsAddColumn != AddColumn{}:
+		return this.addColumnToSql(&s.IsAddColumn)
+	case s.IsRemoveColumn != RemoveColumn{}:
+		return this.removeColumnToSql(&s.IsRemoveColumn)
+	case s.IsInsert.Table != Insert{}.Table:
+		return this.insertToSql(&s.IsInsert)
 	}
-	return m.SQL
+	return s.SQL
 }
 
 func (this *Sqliter) createTableToSql(t *CreateTable) string {

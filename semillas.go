@@ -8,19 +8,18 @@ import (
 )
 
 func main() {
-	dirname := "migrations"
-	files, err := ioutil.ReadDir(dirname)
+	var sqler Sqler
+	config := &Config{}
+	config.Load()
+	files, err := ioutil.ReadDir(config.Db.Semillas)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for _, file := range files {
 
-		migrations := ReadYaml(dirname + "/" + file.Name())
+		semillas := ReadYaml(config.Db.Semillas + "/" + file.Name())
 
-		var sqler Sqler
-		config := &Config{}
-		config.Load()
 		switch config.Db.Type {
 		case "mssql":
 			sqler = &MssqlSqler{}
@@ -28,17 +27,17 @@ func main() {
 			sqler = &Sqliter{}
 		}
 
-		sqler.Migrate(migrations)
+		sqler.Update(semillas)
 	}
 }
 
-func ReadYaml(filename string) []Migration {
+func ReadYaml(filename string) []Semilla {
 
 	yamlFile, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Printf("yamlFile.Get err   %#v ", err)
 	}
-	m := []Migration{}
+	m := []Semilla{}
 	err = yaml.Unmarshal(yamlFile, &m)
 	if err != nil {
 		log.Fatalf("Unmarshal: %#v", err)

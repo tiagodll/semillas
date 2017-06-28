@@ -1,0 +1,22 @@
+---
+
+- create_table:
+  name: authors
+  columns:
+  - string: name
+  - string: email
+
+- create_table: 
+  name: books
+  columns:
+  - string: title
+  - int: author_id
+  - string: description
+  - bool: published
+
+- insert:
+  table: authors
+  columns: [name, email]
+  values:
+  - ['asd', 'qwe']
+  - ['zxc', '123']

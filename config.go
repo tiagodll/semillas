@@ -9,13 +9,14 @@ import (
 
 type Config struct {
 	Db struct {
+		Semillas         string `yaml:"semillas"`
 		Type             string `yaml:"type"`
 		ConnectionString string `yaml:"connectionstring"`
 	}
 }
 
 func (c *Config) Load() {
-	yamlFile, err := ioutil.ReadFile("config.yml")
+	yamlFile, err := ioutil.ReadFile("./config.yml")
 	if err != nil {
 		log.Printf("cant load config file   %#v ", err)
 	}

@@ -1,11 +1,13 @@
 package main
 
 type Sqler interface {
-	Migrate(migrations []Migration)
-	ToSql(m *Migration) string
+	Init()
+	Version() int
+	Update(semilla []Semilla)
+	ToSql(m *Semilla) string
 }
 
-type Migration struct {
+type Semilla struct {
 	IsCreateTable  CreateTable  `yaml:"create_table"`
 	IsDropTable    DropTable    `yaml:"drop_table"`
 	IsAddColumn    AddColumn    `yaml:"add_column"`
@@ -46,7 +48,7 @@ type RemoveColumn struct {
 
 type Insert struct {
 	Sqler
-	Table   string     `yaml:"table"`
-	Columns []string   `yaml:"columns"`
-	Values  [][]string `yaml:"values"`
+	Table   string          `yaml:"table"`
+	Columns []string        `yaml:"columns"`
+	Values  [][]interface{} `yaml:"values"`
 }
