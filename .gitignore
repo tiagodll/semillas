@@ -4,6 +4,7 @@
 *.so
 *.dylib
 *.db
+debug
 
 #sensible files
 config.yml
