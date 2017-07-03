@@ -1,9 +1,11 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"semillas/config"
 	"strings"
 	"time"
 
@@ -11,9 +13,13 @@ import (
 )
 
 func main() {
-	config := &Config{}
-	config.Load()
+	configPath := flag.String("config", "./config/config.yml", "location of the config file")
+	fmt.Printf("config file: %s\n", *configPath)
+
+	config := &config.Config{}
+	config.Load(*configPath)
 	sqler := getSqler(config)
+	fmt.Printf("config: %v\n", config)
 
 	v := sqler.Version()
 	fmt.Printf("current version: %v\n", v)
@@ -35,14 +41,14 @@ func main() {
 	}
 }
 
-func getSqler(config *Config) Sqler {
+func getSqler(config *config.Config) Sqler {
 	var sqler Sqler
 
 	switch config.Db.Type {
 	case "mssql":
-		sqler = &MssqlSqler{}
+		sqler = &MssqlSqler{config: *config}
 	case "sqlite3":
-		sqler = &Sqliter{}
+		sqler = &Sqliter{config: *config}
 	}
 
 	return sqler

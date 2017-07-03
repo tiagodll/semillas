@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"io/ioutil"
@@ -15,8 +15,8 @@ type Config struct {
 	}
 }
 
-func (c *Config) Load() {
-	yamlFile, err := ioutil.ReadFile("./config.yml")
+func (c *Config) Load(filePath string) {
+	yamlFile, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		log.Printf("cant load config file   %#v ", err)
 	}

@@ -1,10 +1,14 @@
 package main
 
 import (
+	"semillas/config"
+
 	_ "github.com/denisenkom/go-mssqldb"
 )
 
-type MssqlSqler struct{}
+type MssqlSqler struct {
+	config config.Config
+}
 
 func (this *MssqlSqler) Version() int { return -1 }
 

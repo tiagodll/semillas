@@ -6,21 +6,23 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"semillas/config"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type Sqliter struct{}
+type Sqliter struct {
+	config config.Config
+}
 
 func (this *Sqliter) Version() int {
-	config := &Config{}
-	config.Load()
-
-	db, err := sql.Open(config.Db.Type, config.Db.ConnectionString)
+	db, err := sql.Open(this.config.Db.Type, this.config.Db.ConnectionString)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
+
+	fmt.Printf("config: %v\n", db)
 
 	row, err := db.Query("Select version from semillas")
 	if err != nil {
@@ -33,17 +35,12 @@ func (this *Sqliter) Version() int {
 }
 
 func (this *Sqliter) Init() {
-	config := &Config{}
-	config.Load()
-
-	os.Remove(config.Db.ConnectionString)
+	os.Remove(this.config.Db.ConnectionString)
 }
 
 func (this *Sqliter) Update(semillas []Semilla) {
-	config := &Config{}
-	config.Load()
 
-	db, err := sql.Open(config.Db.Type, config.Db.ConnectionString)
+	db, err := sql.Open(this.config.Db.Type, this.config.Db.ConnectionString)
 	if err != nil {
 		log.Fatal(err)
 	}
