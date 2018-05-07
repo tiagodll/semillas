@@ -13,7 +13,8 @@ import (
 )
 
 func main() {
-	configPath := flag.String("config", "./config/config.yml", "location of the config file")
+	configPath := flag.String("config", "./config.yml", "location of the config file")
+	flag.Parse()
 	fmt.Printf("config file: %s\n", *configPath)
 
 	config := &config.Config{}
