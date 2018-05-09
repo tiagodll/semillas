@@ -93,6 +93,8 @@ func (this *Sqliter) GetNameAndType(c *Column) (string, string) {
 		return c.IntColumn, "int"
 	case c.FloatColumn != "":
 		return c.FloatColumn, "float"
+	case c.DateColumn != "":
+		return c.DateColumn, "datetime"
 	}
 	return "", ""
 }
